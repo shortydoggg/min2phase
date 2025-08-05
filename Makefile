@@ -9,11 +9,13 @@ MAINPROG = example/MainProgram.java
 
 TESTSRC = test/test.java
 
+DEMO = example/demo.java
+
 ifndef probe
 	probe = 0
 endif
 
-ifndef maxl
+ifndef maxl 
 	maxl = 30
 endif
 
@@ -30,35 +32,37 @@ DISTTEST = dist/test.class
 build: $(DIST)
 
 $(DIST): $(SRC) $(MAINPROG)
-	@javac -d dist $(SRC) $(MAINPROG) -Xlint:all
-	@cp -f $(SRC) dist/cs/min2phase/
-	@cd dist && jar cfe twophase.jar ui.MainProgram ui/*.class cs/min2phase/*.class cs/min2phase/*.java
+	@if not exist dist/ mkdir dist
+	@javac -d dist -cp . $(SRC) $(MAINPROG) -Xlint:all
+	@cd dist && jar cfe twophase.jar ui.MainProgram ui/* cs/*
 
 run: $(DIST)
 	@java -jar $(DIST)
 
 testRnd: $(DISTTEST)
-	@java -ea -cp dist:$(DIST) test 40 $(ntest) $(maxl) 10000000 $(probe) 0
+	@java -ea -cp dist;$(DIST) test 40 $(ntest) $(maxl) 10000000 $(probe) 0
 
 testRndMP: $(DISTTEST)
-	@java -ea -cp dist:$(DIST) test 72 $(ntest) $(maxl) 10000000 $(probe) 0
+	@java -ea -cp dist;$(DIST) test 72 $(ntest) $(maxl) 10000000 $(probe) 0
 
 testRndStd: $(DISTTEST)
-	@java -ea -cp dist:$(DIST) test 40 $(ntest) 30 10000000 $(probe) 0 | grep AvgT
-	@java -ea -cp dist:$(DIST) test 40 $(ntest) 21 10000000 $(probe) 0 | grep AvgT
-	@java -ea -cp dist:$(DIST) test 40 $(ntest) 20 10000000 $(probe) 0 | grep AvgT
+	@java -ea -cp dist;$(DIST) test 40 $(ntest) 30 10000000 $(probe) 0 | grep AvgT
+	@java -ea -cp dist;$(DIST) test 40 $(ntest) 21 10000000 $(probe) 0 | grep AvgT
+	@java -ea -cp dist;$(DIST) test 40 $(ntest) 20 10000000 $(probe) 0 | grep AvgT
 
 testSel: $(DISTTEST)
-	@java -ea -cp dist:$(DIST) test 24
+	@java -ea -cp dist;$(DIST) test 24
 
 demo: $(DIST)
-	@javac -d dist -cp dist:$(DIST) example/demo.java
-	@java -ea -cp dist:$(DIST) demo
+	@javac -d dist -cp dist;$(DIST) example/demo.java
+	@java -ea -cp dist;$(DIST) demo
 
 $(DISTTEST): $(DIST) $(TESTSRC)
-	@javac -d dist -cp dist:$(DIST) $(TESTSRC)
+	@javac -d dist -cp dist;$(DIST) $(TESTSRC)
 
 rebuild: clean build
 
 clean:
-	@rm -rf dist/*
+	@rm -rf dist/
+	@if exist m2pT.data rm -f m2pT.data
+	

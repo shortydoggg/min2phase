@@ -4,3 +4,5 @@ ui/*
 m2pT.data
 test.class
 FullTable.prunP
+dist/
+
